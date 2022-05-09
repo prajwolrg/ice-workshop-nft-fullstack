@@ -17,3 +17,23 @@ This endpoint will look something like this:
 ```
 https://8545-copper-swordtail-j1mvhxv3.ws-eu18.gitpod.io/
 ```
+
+#### Locally
+
+To deploy this project to Gitpod, follow these steps:
+
+1. Clone the repository
+```
+git clone https://github.com/prajwolrg/ice-workshop-nft-fullstack.git
+```
+
+2. Change directory and install dependencies
+```
+cd ice-workshop-nft-fullstack
+npm install
+```
+
+3. Start server
+```
+npm run dev
+```
