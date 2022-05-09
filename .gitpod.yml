@@ -1,14 +1,7 @@
 tasks:
   - name: Install, start node, and deploy
-    init: yarn
-    command: npx hardhat node
-  - name: Deploy smart contract and start server
-    command: |
-      export CLIENT_URL="$(gp url 8545)"
-      gp await-port 8545
-      npx hardhat run scripts/deploy.js --network localhost
-      npm run dev
-    openMode: tab-after
+    init: npm install
+    command: npm run dev
 ports:
   - port: 3000-8545
     visibility: public
