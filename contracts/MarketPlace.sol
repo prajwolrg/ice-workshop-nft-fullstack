@@ -20,7 +20,7 @@ contract MarketPlace {
     }
 
     Item[] public items;
-    mapping(uint256 => bool) public listedTokens;
+    mapping(address => mapping(uint256 => bool)) public listedTokens;
 
     function listForSale(
         uint256 _tokenID,
@@ -40,7 +40,7 @@ contract MarketPlace {
 
         //Check if the token ID is already listed
         require(
-            !listedTokens[_tokenID],
+            !listedTokens[_tokenAddress][_tokenID],
             "MarketPlace: Token is already listed"
         );
 
@@ -61,7 +61,7 @@ contract MarketPlace {
                 _url
             )
         );
-        listedTokens[_tokenID] = true;
+        listedTokens[_tokenAddress][_tokenID] = true;
     }
 
     function buyNFT(uint256 _index) public payable {
@@ -98,7 +98,7 @@ contract MarketPlace {
         //Transfer the amount to owner and royalty receiver
         items[_index].owner.transfer(remainingAmount);
 
-        listedTokens[items[_index].tokenID] = false;
+        listedTokens[items[_index].tokenAddress][items[_index].tokenID] = false;
 
         //Remove the item from the list
         for (uint256 i = _index; i < items.length - 1; i++) {
