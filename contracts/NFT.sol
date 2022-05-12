@@ -21,8 +21,8 @@ contract NFT is
 
     mapping(uint256 => address) public _creators;
 
-    constructor(string memory name, string memory symbol)
-        ERC721(name, symbol)
+    constructor()
+        ERC721('MyToken', 'MTK')
     {}
 
     function safeMint(address to, string memory uri) public onlyOwner {
