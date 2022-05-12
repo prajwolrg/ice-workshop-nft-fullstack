@@ -40,6 +40,7 @@ export default function Home() {
       let item = {
         price,
         tokenId: i.tokenID.toNumber(),
+        index: i.index.toNumber(),
         image: meta.data.image,
         name: meta.data.name,
         description: meta.data.description,
@@ -52,6 +53,7 @@ export default function Home() {
 
   async function buyNft(nft) {
     /* needs the user to sign the transaction, so will use Web3Provider and sign it */
+    console.log(nft)
     const web3Modal = new Web3Modal()
     const connection = await web3Modal.connect()
     const provider = new ethers.providers.Web3Provider(connection)
@@ -60,7 +62,7 @@ export default function Home() {
 
     /* user will be prompted to pay the asking proces to complete the transaction */
     const price = ethers.utils.parseUnits(nft.price.toString(), 'ether')
-    const transaction = await marketPlace.buyNFT(nft.tokenId, {
+    const transaction = await marketPlace.buyNFT(nft.index, {
       value: price
     })
     await transaction.wait()

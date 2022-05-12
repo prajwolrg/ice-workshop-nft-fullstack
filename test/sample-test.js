@@ -42,39 +42,56 @@ describe("NFT and Marketplace", async function () {
       expect(await mytoken.balanceOf(addr1.address)).to.equal(1)
       expect(await mytoken.ownerOf(0)).to.equal(addr1.address)
 
-      await mytoken.safeMint(addr2.address, 'uri2');
+      await mytoken.safeMint(addr1.address, 'uri2');
       expect(await mytoken.totalSupply()).to.equal(2);
-      expect(await mytoken.balanceOf(addr2.address)).to.equal(1)
-      expect(await mytoken.ownerOf(1)).to.equal(addr2.address)
+      expect(await mytoken.balanceOf(addr1.address)).to.equal(2)
+      expect(await mytoken.ownerOf(1)).to.equal(addr1.address)
     });
 
     it("Approve NFT", async function () {
-      await mytoken.connect(addr1).approve(market.address, 0);
+      await mytoken.connect(addr1).setApprovalForAll(market.address, true);
       await mytoken.connect(addr2).setApprovalForAll(market.address, true);
     });
 
     it("List For Sale", async function () {
       expect(await mytoken.creatorOf(0)).to.equal(addr1.address)
       await mytoken.connect(addr1).setTokenRoyalty(0, owner.address, 500)
-      await mytoken.connect(addr2).setTokenRoyalty(1, owner.address, 500)
+      await mytoken.connect(addr1).setTokenRoyalty(1, owner.address, 500)
       await market.connect(addr1).listForSale(0, NFT0_PRICE, mytoken.address, 'http://url1');
-      await market.connect(addr2).listForSale(1, NFT1_PRICE, mytoken.address, 'http://url2');
+      await market.connect(addr1).listForSale(1, NFT1_PRICE, mytoken.address, 'http://url2');
       expect(await market.totalItems()).to.equal(2)
     });
 
-    it("Buy NFT", async function () {
+    it("First Buy NFT", async function () {
       const provider = waffle.provider;
       let prevOwnerBalance = await provider.getBalance(owner.address)
       await market.connect(addr2).buyNFT(0, { value: ethers.utils.parseEther("1.0") })
       let laterOwnerBalance = await provider.getBalance(owner.address)
       expect(await market.totalItems()).to.equal(1)
       expect(await mytoken.totalSupply()).to.equal(2);
-      expect(await mytoken.balanceOf(addr2.address)).to.equal(2)
+      expect(await mytoken.balanceOf(addr2.address)).to.equal(1)
       expect(await mytoken.ownerOf(0)).to.equal(addr2.address)
 
       expect(BigNumber.from(prevOwnerBalance).lt(BigNumber.from(laterOwnerBalance))).to.equal(true)
       expect(BigNumber.from(laterOwnerBalance).eq(BigNumber.from(prevOwnerBalance).add(BigNumber.from(EXPECTED_NFT0_ROYALTY)))).to.equal(true)
     });
+
+    it("Second Buy NFT", async function () {
+      const provider = waffle.provider;
+      let prevOwnerBalance = await provider.getBalance(owner.address)
+
+      await market.connect(addr2).buyNFT(0, { value: ethers.utils.parseEther("2.0") })
+
+      let laterOwnerBalance = await provider.getBalance(owner.address)
+      expect(await market.totalItems()).to.equal(0)
+      expect(await mytoken.totalSupply()).to.equal(2);
+      expect(await mytoken.balanceOf(addr2.address)).to.equal(2)
+      expect(await mytoken.ownerOf(0)).to.equal(addr2.address)
+
+      expect(BigNumber.from(prevOwnerBalance).lt(BigNumber.from(laterOwnerBalance))).to.equal(true)
+      // expect(BigNumber.from(laterOwnerBalance).eq(BigNumber.from(prevOwnerBalance).add(BigNumber.from(EXPECTED_NFT0_ROYALTY)))).to.equal(true)
+    });
+
 
     it("Relist NFT with new royaltyReceiver", async function () {
       await market.connect(addr2).listForSale(0, NFT0_PRICE, mytoken.address, 'http://url1');
@@ -85,6 +102,8 @@ describe("NFT and Marketplace", async function () {
         expect(e.message.search(expectedError)).is.at.least(0)
       }
     });
+
+
   })
 
 });

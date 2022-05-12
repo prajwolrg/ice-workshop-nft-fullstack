@@ -103,6 +103,7 @@ contract MarketPlace {
         //Remove the item from the list
         for (uint256 i = _index; i < items.length - 1; i++) {
             items[i] = items[i + 1];
+            items[i].index -= 1;
         }
         items.pop();
     }
