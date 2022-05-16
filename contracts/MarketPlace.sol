@@ -11,16 +11,22 @@ contract MarketPlace {
     using SafeMath for uint256;
 
     struct Item {
-        uint256 index;
-        uint256 tokenID;
-        uint256 price;
-        address tokenAddress;
-        address payable owner;
-        string url;
+        uint256 index; //Unique identifier for various NFTs on this particular MARKETPLACE
+        address tokenAddress; //Contract address where the NFT exists.
+        uint256 tokenID; //Identifier of NFT on that tokenAddress
+        uint256 price; //Price of the NFT listed for sale
+        address payable owner; //Current owner of the NFT
+        string url; //Points to the additional information about NFT.
+
     }
 
+    //Array of the Items listed for sale
     Item[] public items;
+
+    //Check if the NFT is already listed
+    //listedTokens[tokenAddress][tokenId]
     mapping(address => mapping(uint256 => bool)) public listedTokens;
+
 
     function listForSale(
         uint256 _tokenID,
@@ -31,7 +37,6 @@ contract MarketPlace {
         uint256 index = items.length;
         NFT erc721 = NFT(_tokenAddress);
 
-        //Checks
         // Check if the owner of the token is msg.sender
         require(
             msg.sender == erc721.ownerOf(_tokenID),
@@ -54,9 +59,9 @@ contract MarketPlace {
         items.push(
             Item(
                 index,
+                _tokenAddress,
                 _tokenID,
                 _price,
-                _tokenAddress,
                 payable(msg.sender),
                 _url
             )
@@ -65,7 +70,6 @@ contract MarketPlace {
     }
 
     function buyNFT(uint256 _index) public payable {
-        //Checks
         //Check if required price is supplied
         require(
             msg.value == items[_index].price,
@@ -80,24 +84,23 @@ contract MarketPlace {
             items[_index].tokenID
         );
 
-        //Get the royalty amount
-        address royaltyReceiver;
-        uint256 royaltyAmount;
-
-        (royaltyReceiver, royaltyAmount) = erc721.royaltyInfo(
-            _index,
+        //Get the royalty information
+        (address royaltyReceiver, uint256 royaltyAmount) = erc721.royaltyInfo(
+            items[_index].tokenID,
             msg.value
         );
 
+        //Transfer the royalty amount to the royalty reciever.
         uint256 remainingAmount = msg.value;
         if (royaltyAmount > 0 && royaltyReceiver != address(0)) {
             remainingAmount = msg.value - royaltyAmount;
             payable(royaltyReceiver).transfer(royaltyAmount);
         }
 
-        //Transfer the amount to owner and royalty receiver
+        //Transfer the right amount to owner 
         items[_index].owner.transfer(remainingAmount);
 
+        //Mark particular NFT as not
         listedTokens[items[_index].tokenAddress][items[_index].tokenID] = false;
 
         //Remove the item from the list
