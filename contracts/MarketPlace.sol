@@ -3,12 +3,12 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
-import "./NFT.sol";
+import "./MyToken.sol";
 
 import "hardhat/console.sol";
 
 contract MarketPlace {
-    using SafeMath for uint256;
+    using SafeMath for uint256; 
 
     struct Item {
         uint256 index; //Unique identifier for various NFTs on this particular MARKETPLACE
@@ -35,7 +35,7 @@ contract MarketPlace {
         string memory _url
     ) public {
         uint256 index = items.length;
-        NFT erc721 = NFT(_tokenAddress);
+        MyToken erc721 = MyToken(_tokenAddress);
 
         // Check if the owner of the token is msg.sender
         require(
@@ -76,8 +76,8 @@ contract MarketPlace {
             "MarketPlace: Please pay the amount equal to price"
         );
 
-        //Transfer the NFT to the buyer
-        NFT erc721 = NFT(items[_index].tokenAddress);
+        //Transfer the MyToken to the buyer
+        MyToken erc721 = MyToken(items[_index].tokenAddress);
         erc721.safeTransferFrom(
             items[_index].owner,
             msg.sender,

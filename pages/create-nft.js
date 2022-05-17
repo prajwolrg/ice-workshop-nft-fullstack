@@ -13,7 +13,7 @@ import {
 
 // import NFTMarketplace from '../artifacts/contracts/NFTMarketplace.sol/NFTMarketplace.json'
 // import MarketPlace from '../artifacts/contracts/MarketPlace.sol/MarketPlace.json'
-import NFT from '../artifacts/contracts/NFT.sol/NFT.json'
+import MyToken from '../artifacts/contracts/MyToken.sol/MyToken.json'
 
 export default function CreateItem() {
   const [fileUrl, setFileUrl] = useState(null)
@@ -63,7 +63,7 @@ export default function CreateItem() {
     const signer = provider.getSigner()
 
     /* next, create the item */
-    let NFTContract = new ethers.Contract(NFTAddress, NFT.abi, signer)
+    let NFTContract = new ethers.Contract(NFTAddress, MyToken.abi, signer)
 
     // Marketplace with listing price
     // let listingPrice = await contract.getListingPrice()

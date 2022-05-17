@@ -9,7 +9,7 @@ import {
 } from '../config'
 
 import MarketPlace from '../artifacts/contracts/MarketPlace.sol/MarketPlace.json'
-import NFT from '../artifacts/contracts/NFT.sol/NFT.json'
+import MyToken from '../artifacts/contracts/MyToken.sol/MyToken.json'
 
 export default function Home() {
   const [nfts, setNfts] = useState([])
@@ -21,8 +21,8 @@ export default function Home() {
   async function loadNFTs() {
     /* create a generic provider and query for unsold market items */
     const provider = new ethers.providers.JsonRpcProvider('https://frost-rpc.icenetwork.io:9933')
-
-    const NFTContract = new ethers.Contract(NFTAddress, NFT.abi, provider)
+ 
+    const NFTContract = new ethers.Contract(NFTAddress, MyToken.abi, provider)
     const MarketplaceContract = new ethers.Contract(MarketPlaceAddress, MarketPlace.abi, provider)
 
     console.log('Trying to load NFTs')
@@ -34,7 +34,10 @@ export default function Home() {
     *  them as well as fetch their token metadata
     */
     const items = await Promise.all(data.map(async i => {
+      console.log(i.tokenID)
+      console.log(i.tokenID.toString())
       const tokenUri = await NFTContract.tokenURI(i.tokenID)
+      console.log(tokenUri)
       const meta = await axios.get(tokenUri)
       let price = ethers.utils.formatUnits(i.price.toString(), 'ether')
       let item = {
@@ -47,6 +50,7 @@ export default function Home() {
       }
       return item
     }))
+    console.log(items)
     setNfts(items)
     setLoadingState('loaded') 
   }

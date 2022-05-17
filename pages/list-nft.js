@@ -10,7 +10,7 @@ import {
 } from '../config'
 
 import MarketPlace from '../artifacts/contracts/MarketPlace.sol/MarketPlace.json'
-import NFT from '../artifacts/contracts/NFT.sol/NFT.json'
+import MyToken from '../artifacts/contracts/MyToken.sol/MyToken.json'
 
 export default function ResellNFT() {
   const [formInput, updateFormInput] = useState({ price: '', image: '' })
@@ -38,7 +38,7 @@ export default function ResellNFT() {
     const priceFormatted = ethers.utils.parseUnits(formInput.price, 'ether')
 
     let contractMarketplace = new ethers.Contract(MarketPlaceAddress, MarketPlace.abi, signer)
-		let contractNFT = new ethers.Contract(NFTAddress, NFT.abi, signer)
+		let contractNFT = new ethers.Contract(NFTAddress, MyToken.abi, signer)
 
     let transaction = await contractNFT.approve(MarketPlaceAddress, id)
     await transaction.wait()

@@ -11,7 +11,7 @@ import {
 
 // import NFTMarketplace from '../artifacts/contracts/NFTMarketplace.sol/NFTMarketplace.json'
 import MarketPlace from '../artifacts/contracts/MarketPlace.sol/MarketPlace.json'
-import NFT from '../artifacts/contracts/NFT.sol/NFT.json'
+import MyToken from '../artifacts/contracts/MyToken.sol/MyToken.json'
 
 export default function MyAssets() {
   const [nfts, setNfts] = useState([])
@@ -31,7 +31,7 @@ export default function MyAssets() {
     const walletAddress = await signer.getAddress()
     console.log(walletAddress)
 
-    const NFTContract = new ethers.Contract(NFTAddress, NFT.abi, signer)
+    const NFTContract = new ethers.Contract(NFTAddress, MyToken.abi, signer)
 
     let ownerBalance = await NFTContract.balanceOf(walletAddress)
     ownerBalance = ownerBalance.toNumber()

@@ -20,7 +20,7 @@ describe("NFT and Marketplace", async function () {
   before(async function () {
     [owner, addr1, addr2, ...addrs] = await ethers.getSigners();
 
-    const MyToken = await ethers.getContractFactory("NFT");
+    const MyToken = await ethers.getContractFactory("MyToken");
     mytoken = await MyToken.deploy();
     await mytoken.deployed();
 
