@@ -7,8 +7,8 @@ async function main() {
 
   console.log(hre.network.name)
 
-  const MyToken = await ethers.getContractFactory("NFT");
-  let mytoken = await MyToken.deploy("MyToken", "MTK");
+  const MyToken = await ethers.getContractFactory("MyToken");
+  let mytoken = await MyToken.deploy();
   await mytoken.deployed();
   console.log(`Deployed NFT at ${mytoken.address}`)
 

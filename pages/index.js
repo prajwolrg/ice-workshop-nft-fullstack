@@ -20,7 +20,7 @@ export default function Home() {
 
   async function loadNFTs() {
     /* create a generic provider and query for unsold market items */
-    const provider = new ethers.providers.JsonRpcProvider('https://frost-rpc.icenetwork.io:9933')
+    const provider = new ethers.providers.JsonRpcProvider('https://arctic-rpc.icenetwork.io:9933')
  
     const NFTContract = new ethers.Contract(NFTAddress, MyToken.abi, provider)
     const MarketplaceContract = new ethers.Contract(MarketPlaceAddress, MarketPlace.abi, provider)
