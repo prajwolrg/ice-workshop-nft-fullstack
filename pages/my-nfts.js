@@ -35,6 +35,7 @@ export default function MyAssets() {
 
     let ownerBalance = await NFTContract.balanceOf(walletAddress)
     ownerBalance = ownerBalance.toNumber()
+    console.log(ownerBalance)
 
     let items = []
     for (let i =0; i<ownerBalance; i++) {

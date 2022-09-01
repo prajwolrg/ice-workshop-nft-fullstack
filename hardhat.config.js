@@ -24,7 +24,7 @@ module.exports = {
       url: "https://rpc-mainnet.maticvigil.com",
       accounts: [process.env.PRIVATE_KEY]
     },
-    artic: {
+    arctic: {
       url: "https://arctic-rpc.icenetwork.io:9933",
       accounts: [process.env.PRIVATE_KEY]
     }

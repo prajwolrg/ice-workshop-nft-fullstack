@@ -1,18 +1,15 @@
 import { useState } from 'react'
 import { ethers } from 'ethers'
-import { create as ipfsHttpClient } from 'ipfs-http-client'
 import { useRouter } from 'next/router'
 import Web3Modal from 'web3modal'
 
-const client = ipfsHttpClient('https://ipfs.infura.io:5001/api/v0')
+import fleekStorage from '@fleekhq/fleek-storage-js'
 
 import {
   NFTAddress,
   MarketPlaceAddress
 } from '../config'
 
-// import NFTMarketplace from '../artifacts/contracts/NFTMarketplace.sol/NFTMarketplace.json'
-// import MarketPlace from '../artifacts/contracts/MarketPlace.sol/MarketPlace.json'
 import MyToken from '../artifacts/contracts/MyToken.sol/MyToken.json'
 
 export default function CreateItem() {
@@ -23,20 +20,31 @@ export default function CreateItem() {
   const router = useRouter()
 
   async function onChange(e) {
-    const file = e.target.files[0]
-    try {
-      const added = await client.add(
-        file,
-        {
-          progress: (prog) => console.log(`received: ${prog}`)
-        }
-      )
-      const url = `https://ipfs.infura.io/ipfs/${added.path}`
-      setFileUrl(url)
-    } catch (error) {
-      console.log('Error uploading file: ', error)
+    // load the file from disk
+    const image = e.target.files[0]
+    console.log(image)
+    const reader = new window.FileReader()
+    reader.readAsArrayBuffer(image)
+    reader.onloadend = async () => {
+
+      try {
+
+        const uploadedFile = await fleekStorage.upload({
+          apiKey: process.env.FLEEK_STORAGE_API_KEY,
+          apiSecret: process.env.FLEEK_STORAGE_API_SECRET,
+          key: image.name,
+          ContentType: image.type,
+          data: Buffer(reader.result),
+        });
+        console.log(uploadedFile.hash)
+        const url = `https://ipfs.io/ipfs/${uploadedFile.hash}`
+        setFileUrl(url)
+      } catch (err) {
+        console.log('Error uploading file: ', err)
+      }
     }
   }
+
   async function uploadToIPFS() {
     const { name, description } = formInput
     if (!name || !description || !fileUrl) return
@@ -45,8 +53,14 @@ export default function CreateItem() {
       name, description, image: fileUrl
     })
     try {
-      const added = await client.add(data)
-      const url = `https://ipfs.infura.io/ipfs/${added.path}`
+        const uploadedFile = await fleekStorage.upload({
+          apiKey: process.env.FLEEK_STORAGE_API_KEY,
+          apiSecret: process.env.FLEEK_STORAGE_API_SECRET,
+          key: 'test-key',
+          ContentType: 'application/json',
+          data: data
+        });
+      const url = `https://ipfs.io/ipfs/${uploadedFile.hash}`
       /* after file is uploaded to IPFS, return the URL to use it in the transaction */
       return url
     } catch (error) {
@@ -115,6 +129,7 @@ export default function CreateItem() {
         />
         {
           fileUrl && (
+            // eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text
             <img className="rounded mt-4" width="350" src={fileUrl} />
           )
         }
