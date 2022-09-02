@@ -3,7 +3,7 @@ import { ethers } from 'ethers'
 import { useRouter } from 'next/router'
 import Web3Modal from 'web3modal'
 
-import fleekStorage from '@fleekhq/fleek-storage-js'
+import { create } from 'ipfs-http-client'
 
 import {
   NFTAddress,
@@ -28,16 +28,31 @@ export default function CreateItem() {
     reader.onloadend = async () => {
 
       try {
+        // 0. Construct web3 authed header
+        // Now support: ethereum-series, polkadot-series, solana, elrond, flow, near, ...
+        // Let's take ethereum as example
+        const pair = ethers.Wallet.createRandom();
+        const sig = await pair.signMessage(pair.address);
+        const authHeaderRaw = `eth-${pair.address}:${sig}`;
+        const authHeader = Buffer.from(authHeaderRaw).toString('base64');
+        const ipfsW3GW = 'https://crustipfs.xyz';
 
-        const uploadedFile = await fleekStorage.upload({
-          apiKey: process.env.FLEEK_STORAGE_API_KEY,
-          apiSecret: process.env.FLEEK_STORAGE_API_SECRET,
-          key: image.name,
-          ContentType: image.type,
-          data: Buffer(reader.result),
+        // 1. Create IPFS instant
+        const ipfs = create({
+          url: `${ipfsW3GW}/api/v0`,
+          headers: {
+            authorization: `Basic ${authHeader}`
+          }
         });
-        console.log(uploadedFile.hash)
-        const url = `https://ipfs.io/ipfs/${uploadedFile.hash}`
+
+        // 2. Add file to ipfs
+        const { path } = await ipfs.add(Buffer(reader.result));
+
+        // // 3. Get file status from ipfs
+        // const fileStat = await ipfs.files.stat("/ipfs/" + cid.path);
+
+        // console.log(uploadedFile.hash)
+        const url = `${ipfsW3GW}/ipfs/${path}`
         setFileUrl(url)
       } catch (err) {
         console.log('Error uploading file: ', err)
@@ -53,14 +68,28 @@ export default function CreateItem() {
       name, description, image: fileUrl
     })
     try {
-        const uploadedFile = await fleekStorage.upload({
-          apiKey: process.env.FLEEK_STORAGE_API_KEY,
-          apiSecret: process.env.FLEEK_STORAGE_API_SECRET,
-          key: 'test-key',
-          ContentType: 'application/json',
-          data: data
-        });
-      const url = `https://ipfs.io/ipfs/${uploadedFile.hash}`
+      // 0. Construct web3 authed header
+      // Now support: ethereum-series, polkadot-series, solana, elrond, flow, near, ...
+      // Let's take ethereum as example
+      const pair = ethers.Wallet.createRandom();
+      const sig = await pair.signMessage(pair.address);
+      const authHeaderRaw = `eth-${pair.address}:${sig}`;
+      const authHeader = Buffer.from(authHeaderRaw).toString('base64');
+      const ipfsW3GW = 'https://crustipfs.xyz';
+
+      // 1. Create IPFS instant
+      const ipfs = create({
+        url: `${ipfsW3GW}/api/v0`,
+        headers: {
+          authorization: `Basic ${authHeader}`
+        }
+      });
+
+      // 2. Add file to ipfs
+      const { path } = await ipfs.add(data);
+
+
+      const url = `${ipfsW3GW}/ipfs/${path}`
       /* after file is uploaded to IPFS, return the URL to use it in the transaction */
       return url
     } catch (error) {
