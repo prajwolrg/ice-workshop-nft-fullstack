@@ -4,7 +4,7 @@ require('dotenv').config();
 
 // const infuraId = fs.readFileSync(".infuraid").toString().trim() || "";
 
-console.log(process.env.PRIVATE_KEY)
+// console.log(process.env.PRIVATE_KEY)
 
 module.exports = {
   defaultNetwork: "hardhat",
